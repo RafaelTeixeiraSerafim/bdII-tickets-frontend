@@ -1,0 +1,64 @@
+<app-list-toolbar
+  title="Responsáveis"
+  [subtitle]="total() + ' registro(s)'"
+  newLabel="Novo responsável"
+  searchPlaceholder="Cargo, especialidade ou usuário"
+  (search)="setSearch($event)"
+  (create)="openForm()"
+/>
+
+<div class="card overflow-hidden">
+  @if (loading()) { <div class="progress-bar"></div> }
+
+  <div class="overflow-x-auto">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th class="th-sort w-16" (click)="toggleSort('id')">
+            ID <span class="material-icons mi-16 text-slate-400">{{ sortIcon('id') }}</span>
+          </th>
+          <th class="th-sort" (click)="toggleSort('cargo')">
+            Cargo <span class="material-icons mi-16 text-slate-400">{{ sortIcon('cargo') }}</span>
+          </th>
+          <th>Especialidade</th>
+          <th>Usuário</th>
+          <th class="text-right">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of paged(); track r.id) {
+          <tr>
+            <td>{{ r.id }}</td>
+            <td class="font-medium text-slate-700">{{ r.cargo }}</td>
+            <td>{{ r.especialidade || '—' }}</td>
+            <td>{{ r.usuario?.nome || '—' }}</td>
+            <td class="text-right whitespace-nowrap">
+              <button class="btn-icon" title="Editar" (click)="openForm(r)">
+                <span class="material-icons mi-20">edit</span>
+              </button>
+              <button class="btn-icon hover:!text-rose-600" title="Excluir" (click)="confirmDelete(r, r.cargo)">
+                <span class="material-icons mi-20">delete</span>
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="text-center text-slate-400 py-10">
+              @if (!loading()) { Nenhum responsável encontrado. }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <app-paginator
+    [page]="page()"
+    [pageCount]="pageCount()"
+    [rangeStart]="rangeStart()"
+    [rangeEnd]="rangeEnd()"
+    [total]="total()"
+    (prev)="prevPage()"
+    (next)="nextPage()"
+  />
+</div>

@@ -1,0 +1,88 @@
+<app-list-toolbar
+  title="Usuários"
+  [subtitle]="total() + ' registro(s)'"
+  newLabel="Novo usuário"
+  searchPlaceholder="Nome ou e-mail"
+  (search)="setSearch($event)"
+  (create)="openForm()"
+/>
+
+<div class="card overflow-hidden">
+  @if (loading()) { <div class="progress-bar"></div> }
+
+  <div class="overflow-x-auto">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th class="th-sort w-16" (click)="toggleSort('id')">
+            ID <span class="material-icons mi-16 text-slate-400">{{ sortIcon('id') }}</span>
+          </th>
+          <th class="th-sort" (click)="toggleSort('nome')">
+            Nome <span class="material-icons mi-16 text-slate-400">{{ sortIcon('nome') }}</span>
+          </th>
+          <th class="th-sort" (click)="toggleSort('email')">
+            E-mail <span class="material-icons mi-16 text-slate-400">{{ sortIcon('email') }}</span>
+          </th>
+          <th class="th-sort" (click)="toggleSort('role')">
+            Perfil <span class="material-icons mi-16 text-slate-400">{{ sortIcon('role') }}</span>
+          </th>
+          <th>Ativo</th>
+          <th class="th-sort" (click)="toggleSort('criado_em')">
+            Criado em <span class="material-icons mi-16 text-slate-400">{{ sortIcon('criado_em') }}</span>
+          </th>
+          <th class="text-right">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (u of paged(); track u.id) {
+          <tr>
+            <td>{{ u.id }}</td>
+            <td class="font-medium text-slate-700">{{ u.nome }}</td>
+            <td>{{ u.email }}</td>
+            <td>
+              <span class="badge" [class]="roleMeta(u.role)?.badge">
+                {{ roleMeta(u.role)?.label ?? u.role }}
+              </span>
+            </td>
+            <td>
+              @if (u.ativo) {
+                <span class="material-icons mi-20 text-emerald-500" title="Ativo">check_circle</span>
+              } @else {
+                <span class="material-icons mi-20 text-slate-300" title="Inativo">cancel</span>
+              }
+            </td>
+            <td>{{ u.criado_em | date: 'dd/MM/yyyy' }}</td>
+            <td class="text-right whitespace-nowrap">
+              @if (canManage(u)) {
+                <button class="btn-icon" title="Editar" (click)="openForm(u)">
+                  <span class="material-icons mi-20">edit</span>
+                </button>
+                <button class="btn-icon hover:!text-rose-600" title="Excluir" (click)="confirmDelete(u, u.nome)">
+                  <span class="material-icons mi-20">delete</span>
+                </button>
+              } @else {
+                <span class="text-xs text-slate-300">—</span>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="7" class="text-center text-slate-400 py-10">
+              @if (!loading()) { Nenhum usuário encontrado. }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <app-paginator
+    [page]="page()"
+    [pageCount]="pageCount()"
+    [rangeStart]="rangeStart()"
+    [rangeEnd]="rangeEnd()"
+    [total]="total()"
+    (prev)="prevPage()"
+    (next)="nextPage()"
+  />
+</div>

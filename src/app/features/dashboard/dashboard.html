@@ -1,0 +1,101 @@
+<div class="mb-6">
+  <h1 class="text-2xl font-semibold text-slate-800">Dashboard</h1>
+  <p class="text-sm text-slate-500">Visão geral dos tickets</p>
+</div>
+
+@if (loading()) { <div class="progress-bar mb-4 rounded"></div> }
+
+<!-- Stat cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+  <div class="card p-5">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-slate-500">Total</p>
+        <p class="text-3xl font-semibold text-slate-800">{{ total() }}</p>
+      </div>
+      <span class="material-icons text-slate-300" style="font-size: 40px">confirmation_number</span>
+    </div>
+  </div>
+  <div class="card p-5">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-slate-500">Em aberto</p>
+        <p class="text-3xl font-semibold text-blue-600">{{ openCount() }}</p>
+      </div>
+      <span class="material-icons text-blue-200" style="font-size: 40px">pending_actions</span>
+    </div>
+  </div>
+  <div class="card p-5">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-slate-500">Resolvidos</p>
+        <p class="text-3xl font-semibold text-emerald-600">{{ resolvedCount() }}</p>
+      </div>
+      <span class="material-icons text-emerald-200" style="font-size: 40px">task_alt</span>
+    </div>
+  </div>
+  <div class="card p-5">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-slate-500">Críticos</p>
+        <p class="text-3xl font-semibold text-rose-600">{{ criticalCount() }}</p>
+      </div>
+      <span class="material-icons text-rose-200" style="font-size: 40px">priority_high</span>
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Breakdown -->
+  <div class="card p-6">
+    <h2 class="text-lg font-semibold text-slate-800 mb-4">Por status</h2>
+    <div class="space-y-3">
+      @for (s of byStatus(); track s.value) {
+        <div>
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-slate-600">{{ s.label }}</span>
+            <span class="text-slate-400">{{ s.count }}</span>
+          </div>
+          <div class="h-2 rounded-full bg-slate-100 overflow-hidden">
+            <div class="h-full rounded-full bg-blue-500" [style.width.%]="pct(s.count)"></div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <h2 class="text-lg font-semibold text-slate-800 mt-6 mb-4">Por prioridade</h2>
+    <div class="space-y-3">
+      @for (p of byPrioridade(); track p.value) {
+        <div>
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-slate-600">{{ p.label }}</span>
+            <span class="text-slate-400">{{ p.count }}</span>
+          </div>
+          <div class="h-2 rounded-full bg-slate-100 overflow-hidden">
+            <div class="h-full rounded-full bg-amber-500" [style.width.%]="pct(p.count)"></div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Recent tickets -->
+  <div class="card p-6 lg:col-span-2">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold text-slate-800">Tickets recentes</h2>
+      <a routerLink="/tickets" class="text-sm text-blue-600 hover:underline">Ver todos</a>
+    </div>
+    <div class="divide-y divide-slate-100">
+      @for (t of recent(); track t.id) {
+        <a [routerLink]="['/tickets', t.id]" class="flex items-center gap-3 py-3 hover:bg-slate-50 -mx-2 px-2 rounded-lg">
+          <span class="text-xs text-slate-400 w-10">#{{ t.id }}</span>
+          <span class="flex-1 text-slate-700 truncate">{{ t.titulo }}</span>
+          <span class="badge" [class]="statusMeta(t.status)?.badge">{{ statusMeta(t.status)?.label }}</span>
+          <span class="text-xs text-slate-400 hidden sm:inline">{{ t.criado_em | date: 'dd/MM/yyyy' }}</span>
+        </a>
+      } @empty {
+        <p class="text-slate-400 text-sm py-3">Nenhum ticket cadastrado.</p>
+      }
+    </div>
+  </div>
+</div>

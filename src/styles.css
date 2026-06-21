@@ -1,0 +1,135 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  background-color: #f8fafc; /* slate-50 */
+  color: #0f172a; /* slate-900 */
+}
+
+/* Material Icons font (loaded in index.html) sizing helpers */
+.material-icons {
+  font-size: 24px;
+  line-height: 1;
+  vertical-align: middle;
+  user-select: none;
+}
+.mi-16 { font-size: 16px; }
+.mi-18 { font-size: 18px; }
+.mi-20 { font-size: 20px; }
+
+@layer components {
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-slate-200;
+  }
+
+  /* Buttons */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg font-medium text-sm px-4 h-10
+      transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1
+      disabled:opacity-50 disabled:cursor-not-allowed select-none;
+  }
+  .btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+  }
+  .btn-secondary {
+    @apply bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 focus:ring-slate-400;
+  }
+  .btn-danger {
+    @apply bg-rose-600 text-white hover:bg-rose-700 focus:ring-rose-500;
+  }
+  .btn-icon {
+    @apply inline-flex items-center justify-center w-9 h-9 rounded-lg text-slate-500
+      hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-300;
+  }
+
+  /* Form controls */
+  .label {
+    @apply block text-sm font-medium text-slate-600 mb-1;
+  }
+  /* Required-field marker: add the `required` class to a .label */
+  .label.required::after {
+    content: ' *';
+    @apply text-rose-500 font-semibold;
+  }
+  .input {
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3 h-10 text-sm text-slate-800
+      placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none
+      transition disabled:bg-slate-50 disabled:text-slate-400;
+  }
+  textarea.input {
+    @apply h-auto py-2 leading-relaxed;
+  }
+  select.input {
+    @apply pr-9 appearance-none bg-no-repeat cursor-pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-position: right 0.5rem center;
+    background-size: 1.1rem;
+  }
+  .field-error {
+    @apply text-rose-600 text-xs mt-1;
+  }
+
+  .badge {
+    @apply inline-block px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  /* Toggle switch (wraps an sr-only checkbox using `peer`) */
+  .toggle-track {
+    @apply relative w-10 h-6 rounded-full bg-slate-300 transition-colors
+      peer-checked:bg-blue-600 peer-focus:ring-2 peer-focus:ring-blue-200
+      after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-5 after:h-5
+      after:bg-white after:rounded-full after:shadow after:transition-transform
+      peer-checked:after:translate-x-4;
+  }
+
+  /* Tables */
+  .data-table {
+    @apply w-full text-sm text-left;
+  }
+  .data-table thead th {
+    @apply px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500
+      border-b border-slate-200 bg-slate-50 whitespace-nowrap;
+  }
+  .data-table tbody td {
+    @apply px-4 py-3 border-b border-slate-100 text-slate-600 align-middle;
+  }
+  .data-table tbody tr:hover {
+    @apply bg-slate-50/70;
+  }
+  .th-sort {
+    @apply cursor-pointer select-none hover:text-slate-700;
+  }
+}
+
+@layer utilities {
+  /* Indeterminate loading bar */
+  .progress-bar {
+    @apply relative h-1 w-full overflow-hidden bg-blue-100;
+  }
+  .progress-bar::after {
+    content: '';
+    @apply absolute top-0 h-full bg-blue-500;
+    animation: indeterminate 1.15s ease-in-out infinite;
+  }
+
+  /* Button spinner */
+  .spinner {
+    @apply inline-block w-5 h-5 rounded-full animate-spin;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: #fff;
+  }
+}
+
+@keyframes indeterminate {
+  0% { left: -40%; width: 40%; }
+  50% { left: 25%; width: 55%; }
+  100% { left: 100%; width: 40%; }
+}

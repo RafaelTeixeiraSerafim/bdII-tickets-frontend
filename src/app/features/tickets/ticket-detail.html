@@ -1,0 +1,149 @@
+<div class="mb-4">
+  <a routerLink="/tickets" class="text-sm text-slate-500 hover:text-slate-700 inline-flex items-center gap-1">
+    <span class="material-icons mi-18">arrow_back</span> Voltar para tickets
+  </a>
+</div>
+
+@if (loading()) { <div class="progress-bar mb-4 rounded"></div> }
+
+@if (ticket(); as t) {
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Main column -->
+    <div class="lg:col-span-2 space-y-6">
+      <div class="card p-6">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <p class="text-sm text-slate-400">Ticket #{{ t.id }}</p>
+            <h1 class="text-2xl font-semibold text-slate-800">{{ t.titulo }}</h1>
+          </div>
+          @if (isStaff) {
+            <button class="btn btn-secondary" (click)="editTicket()">
+              <span class="material-icons mi-20">edit</span> Editar
+            </button>
+          }
+        </div>
+
+        <div class="flex gap-2 mt-3">
+          <span class="badge" [class]="statusMeta(t.status)?.badge">
+            {{ statusMeta(t.status)?.label ?? t.status }}
+          </span>
+          <span class="badge" [class]="prioridadeMeta(t.prioridade)?.badge">
+            {{ prioridadeMeta(t.prioridade)?.label ?? t.prioridade }}
+          </span>
+        </div>
+
+        <p class="mt-4 text-slate-600 whitespace-pre-wrap">{{ t.descricao }}</p>
+      </div>
+
+      <!-- Comments -->
+      <div class="card p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-slate-800">
+            Comentários ({{ comentarios().length }})
+          </h2>
+          <button class="btn btn-primary" (click)="addComentario()">
+            <span class="material-icons mi-20">add_comment</span> Comentar
+          </button>
+        </div>
+
+        @for (c of comentarios(); track c.id) {
+          <div class="border-b border-slate-100 py-3 last:border-0">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="font-medium text-slate-700">
+                  {{ c.usuario?.nome || 'Usuário #' + c.usuario_id }}
+                </span>
+                @if (c.interno) {
+                  <span class="badge bg-amber-100 text-amber-700">INTERNO</span>
+                }
+                <span class="text-xs text-slate-400">{{ c.criado_em | date: 'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+              @if (isStaff) {
+                <button class="btn-icon hover:!text-rose-600" title="Excluir" (click)="deleteComentario(c)">
+                  <span class="material-icons mi-18">delete</span>
+                </button>
+              }
+            </div>
+            <p class="text-slate-600 mt-1 whitespace-pre-wrap">{{ c.conteudo }}</p>
+
+            @if (arquivosDoComentario(c.id); as files) {
+              @if (files.length) {
+                <div class="mt-2 flex flex-wrap gap-2">
+                  @for (a of files; track a.id) {
+                    <a
+                      [href]="a.uri"
+                      target="_blank"
+                      rel="noopener"
+                      class="inline-flex items-center gap-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md px-2 py-1 transition-colors"
+                    >
+                      <span class="material-icons mi-16 text-slate-400">attach_file</span>
+                      <span class="truncate max-w-[12rem]">{{ a.nome_original }}</span>
+                      <span class="text-slate-400">{{ formatBytes(a.tamanho_bytes) }}</span>
+                    </a>
+                  }
+                </div>
+              }
+            }
+          </div>
+        } @empty {
+          <p class="text-slate-400 text-sm">Nenhum comentário ainda.</p>
+        }
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="space-y-6">
+      <div class="card p-6">
+        <h2 class="text-sm font-semibold text-slate-500 uppercase mb-3">Detalhes</h2>
+        <dl class="space-y-3 text-sm">
+          <div>
+            <dt class="text-slate-400">Solicitante</dt>
+            <dd class="text-slate-700">{{ t.usuario?.nome || '—' }}</dd>
+          </div>
+          <div>
+            <dt class="text-slate-400">Responsável</dt>
+            <dd class="text-slate-700">{{ t.responsavel?.usuario?.nome || '—' }}</dd>
+          </div>
+          <div>
+            <dt class="text-slate-400">Categoria</dt>
+            <dd class="text-slate-700">{{ t.categoria?.nome || '—' }}</dd>
+          </div>
+          <div>
+            <dt class="text-slate-400">Criado em</dt>
+            <dd class="text-slate-700">{{ t.criado_em | date: 'dd/MM/yyyy HH:mm' }}</dd>
+          </div>
+          <div>
+            <dt class="text-slate-400">Atualizado em</dt>
+            <dd class="text-slate-700">{{ t.atualizado_em | date: 'dd/MM/yyyy HH:mm' }}</dd>
+          </div>
+          @if (t.fechado_em) {
+            <div>
+              <dt class="text-slate-400">Fechado em</dt>
+              <dd class="text-slate-700">{{ t.fechado_em | date: 'dd/MM/yyyy HH:mm' }}</dd>
+            </div>
+          }
+        </dl>
+      </div>
+
+      <div class="card p-6">
+        <h2 class="text-sm font-semibold text-slate-500 uppercase mb-3">
+          Arquivos ({{ visibleArquivos().length }})
+        </h2>
+        @for (a of visibleArquivos(); track a.id) {
+          <a
+            [href]="a.uri"
+            target="_blank"
+            rel="noopener"
+            class="flex items-center gap-2 py-2 text-sm text-blue-600 hover:underline border-b border-slate-100 last:border-0"
+          >
+            <span class="material-icons mi-18 text-slate-400">attach_file</span>
+            <span class="flex-1 truncate">{{ a.nome_original }}</span>
+            <span class="text-xs text-slate-400">{{ formatBytes(a.tamanho_bytes) }}</span>
+          </a>
+        } @empty {
+          <p class="text-slate-400 text-sm">Nenhum arquivo anexado.</p>
+        }
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,62 @@
+<app-list-toolbar
+  title="Categorias"
+  [subtitle]="total() + ' registro(s)'"
+  newLabel="Nova categoria"
+  searchPlaceholder="Nome ou descrição"
+  (search)="setSearch($event)"
+  (create)="openForm()"
+/>
+
+<div class="card overflow-hidden">
+  @if (loading()) { <div class="progress-bar"></div> }
+
+  <div class="overflow-x-auto">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th class="th-sort w-16" (click)="toggleSort('id')">
+            ID <span class="material-icons mi-16 text-slate-400">{{ sortIcon('id') }}</span>
+          </th>
+          <th class="th-sort" (click)="toggleSort('nome')">
+            Nome <span class="material-icons mi-16 text-slate-400">{{ sortIcon('nome') }}</span>
+          </th>
+          <th>Descrição</th>
+          <th class="text-right">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of paged(); track c.id) {
+          <tr>
+            <td>{{ c.id }}</td>
+            <td class="font-medium text-slate-700">{{ c.nome }}</td>
+            <td>{{ c.descricao || '—' }}</td>
+            <td class="text-right whitespace-nowrap">
+              <button class="btn-icon" title="Editar" (click)="openForm(c)">
+                <span class="material-icons mi-20">edit</span>
+              </button>
+              <button class="btn-icon hover:!text-rose-600" title="Excluir" (click)="confirmDelete(c, c.nome)">
+                <span class="material-icons mi-20">delete</span>
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4" class="text-center text-slate-400 py-10">
+              @if (!loading()) { Nenhuma categoria encontrada. }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <app-paginator
+    [page]="page()"
+    [pageCount]="pageCount()"
+    [rangeStart]="rangeStart()"
+    [rangeEnd]="rangeEnd()"
+    [total]="total()"
+    (prev)="prevPage()"
+    (next)="nextPage()"
+  />
+</div>
