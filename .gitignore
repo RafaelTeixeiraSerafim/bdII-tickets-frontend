@@ -28,6 +28,9 @@ yarn-error.log
 !.vscode/extensions.json
 .history/*
 
+# Local environment overrides (BACKEND_URL, API_BASE_URL, FRONTEND_PORT, PRODUCTION)
+.env
+
 # Miscellaneous
 /.angular/cache
 .sass-cache/
