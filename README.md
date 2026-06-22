@@ -1,68 +1,70 @@
 # TicketsFrontend
 
-Angular 20 admin dashboard for the **TicketsCrud** Go API (technical-support tickets / "assistência técnica"). Provides login + full CRUD over all six entities: Tickets, Usuários, Categorias, Responsáveis, Comentários and Arquivos.
+Painel administrativo em Angular 20 para a API Go **TicketsCrud** (chamados de assistência técnica). Oferece login + CRUD completo sobre as seis entidades: Tickets, Usuários, Categorias, Responsáveis, Comentários e Arquivos.
 
-Stack: Angular 20 (standalone components + signals), Tailwind CSS with custom components (tables, dialogs, toasts), JWT auth.
+Stack: Angular 20 (componentes standalone + signals), Tailwind CSS com componentes personalizados (tabelas, diálogos, toasts), autenticação JWT.
 
-## Prerequisites
+## Pré-requisitos
 
-- Node.js 20+ and npm
-- The TicketsCrud API running and reachable (default `http://localhost:8080`)
+- Node.js 20+ e npm
+- A API TicketsCrud em execução e acessível (padrão `http://localhost:8080`)
 
-## Run (development)
+## Executar (desenvolvimento)
 
-1. Make sure the TicketsCrud API is running. If it listens somewhere other than
-   `http://localhost:8080`, set `BACKEND_URL` (see [Configuration](#configuration)).
+1. Certifique-se de que a API TicketsCrud está em execução. Se ela escutar em um
+   endereço diferente de `http://localhost:8080`, defina `BACKEND_URL` (veja
+   [Configuração](#configuração)).
 
-2. Start the frontend:
+2. Inicie o frontend:
    ```bash
    npm install
-   npm start          # serves on FRONTEND_PORT (default 4200) with the dev proxy
+   npm start          # serve na FRONTEND_PORT (padrão 4200) com o proxy de dev
    ```
-   Open `http://localhost:4200`.
+   Abra `http://localhost:4200`.
 
-The dev server proxies `/api/*` to the backend (see `proxy.conf.js`), so the browser never hits a cross-origin request during development. The proxy target and other settings are configurable — see [Configuration](#configuration).
+O servidor de desenvolvimento faz proxy de `/api/*` para o backend (veja `proxy.conf.js`), de modo que o navegador nunca faz uma requisição cross-origin durante o desenvolvimento. O destino do proxy e outras configurações são ajustáveis — veja [Configuração](#configuração).
 
-## Configuration
+## Configuração
 
-Configuration is driven by environment variables (read from a local `.env` file
-if present — copy `.env.example` to `.env` to start). All are optional; the
-defaults reproduce the standard local setup. You can also pass them inline, e.g.
+A configuração é controlada por variáveis de ambiente (lidas de um arquivo `.env`
+local, se presente — copie `.env.example` para `.env` para começar). Todas são
+opcionais; os padrões reproduzem a configuração local padrão. Você também pode
+passá-las inline, por exemplo
 `BACKEND_URL=http://localhost:9000 FRONTEND_PORT=4300 npm start`.
 
-| Variable | Default | When it applies | Description |
-|----------|---------|-----------------|-------------|
-| `BACKEND_URL` | `http://localhost:8080` | dev serve | URL the dev-server proxy forwards `/api` to. Used by `proxy.conf.js`. |
-| `FRONTEND_PORT` | `4200` | dev serve | Port the Angular dev server listens on. Used by `scripts/serve.js`. |
-| `API_BASE_URL` | `/api` | build time | Base URL the app calls. Keep `/api` in dev (uses the proxy); set to the API origin for production, e.g. `https://api.example.com`. |
-| `PRODUCTION` | `false` | build time | Marks the build as production (`true`/`false`). |
+| Variável | Padrão | Quando se aplica | Descrição |
+|----------|--------|------------------|-----------|
+| `BACKEND_URL` | `http://localhost:8080` | serve de dev | URL para a qual o proxy do dev-server encaminha `/api`. Usada por `proxy.conf.js`. |
+| `FRONTEND_PORT` | `4200` | serve de dev | Porta em que o servidor de desenvolvimento Angular escuta. Usada por `scripts/serve.js`. |
+| `API_BASE_URL` | `/api` | tempo de build | URL base que o app chama. Mantenha `/api` em dev (usa o proxy); defina para a origem da API em produção, por exemplo `https://api.example.com`. |
+| `PRODUCTION` | `false` | tempo de build | Marca o build como produção (`true`/`false`). |
 
-How it works: `BACKEND_URL`/`FRONTEND_PORT` are read at dev-serve time by the
-Node config scripts. `API_BASE_URL`/`PRODUCTION` are baked into the bundle at
-build time — `scripts/set-env.js` generates `src/environments/environment.ts`
-from them, run automatically by the `prestart` / `prebuild` npm hooks (or
-manually via `npm run set-env`).
+Como funciona: `BACKEND_URL`/`FRONTEND_PORT` são lidas em tempo de serve de dev
+pelos scripts de configuração Node. `API_BASE_URL`/`PRODUCTION` são embutidas no
+bundle em tempo de build — `scripts/set-env.js` gera
+`src/environments/environment.ts` a partir delas, executado automaticamente pelos
+hooks npm `prestart` / `prebuild` (ou manualmente via `npm run set-env`).
 
-## Build (production)
+## Build (produção)
 
 ```bash
-npm run build      # outputs to dist/TicketsFrontend (runs set-env first)
+npm run build      # gera em dist/TicketsFrontend (executa set-env antes)
 ```
 
-In production, either serve the static build behind a host that proxies `/api`
-to the Go API (e.g. nginx) and keep `API_BASE_URL=/api`, or set
-`API_BASE_URL` to the API origin before building.
+Em produção, sirva o build estático atrás de um host que faça proxy de `/api`
+para a API Go (por exemplo nginx) e mantenha `API_BASE_URL=/api`, ou defina
+`API_BASE_URL` para a origem da API antes de fazer o build.
 
-## Project structure
+## Estrutura do projeto
 
 ```
 src/app/
   core/
-    models/        TypeScript interfaces + enum metadata (mirror the API, snake_case)
-    auth/          AuthService, JWT interceptor, route guards
-    interceptors/  error interceptor (surfaces plain-text API errors as toasts)
-    services/      generic CrudService<T> + one service per entity
-  layout/          MainLayout (sidenav + toolbar shell)
-  shared/          ConfirmDialog, EntityListPage base class
-  features/        login, dashboard, and <entity>/ list + form-dialog per entity
+    models/        Interfaces TypeScript + metadados de enum (espelham a API, snake_case)
+    auth/          AuthService, interceptor JWT, guards de rota
+    interceptors/  interceptor de erros (exibe erros de texto puro da API como toasts)
+    services/      CrudService<T> genérico + um service por entidade
+  layout/          MainLayout (shell com sidenav + toolbar)
+  shared/          ConfirmDialog, classe base EntityListPage
+  features/        login, dashboard e <entidade>/ list + form-dialog por entidade
 ```
